@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 #api-integration
  
 API_URL = getenv("API_URL", "https://yt.sanatanixtech.site") #youtube song url
-API_KEY = getenv("API_KEY", None) # youtube song api key, get it from 
+API_KEY = getenv("API_KEY", "radhexop") # youtube song api key, get it from 
 
 
 def cookie_txt_file():
