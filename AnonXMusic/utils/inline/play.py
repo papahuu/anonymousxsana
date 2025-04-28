@@ -3,7 +3,10 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
 
 # Initialize your Pyrogram Client
-app = Client("your_bot", api_id="14050586", api_hash="42a60d9c657b106370c79bb0a8ac560c", bot_token="7967697232:AAHSVO7F8xk3wOGOcPYiqxMnHl1oKWKzZrs")
+app = Client("your_bot", 
+api_id="14050586", 
+api_hash="42a60d9c657b106370c79bb0a8ac560c",
+bot_token="7967697232:AAHSVO7F8xk3wOGOcPYiqxMnHl1oKWKzZrs")
 
 # ---------- Buttons ----------
 def stylish_stream_panel():
