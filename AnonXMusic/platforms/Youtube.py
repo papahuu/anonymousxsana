@@ -15,9 +15,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from youtubesearchpython.__future__ import VideosSearch, CustomSearch
 
-from LyraMusic import LOGGER
-from LyraMusic.utils.database import is_on_off
-from LyraMusic.utils.formatters import time_to_seconds
+from AnonXMusic import LOGGER
+from AnonXMusic.utils.database import is_on_off
+from AnonXMusic.utils.formatters import time_to_seconds
 
 YT_API_KEY = "radhexop"
 YTPROXY = "https://yt.sanatanixtech.site"
