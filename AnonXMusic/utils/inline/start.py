@@ -14,11 +14,11 @@ def start_panel(support_chat_url: str, support_channel_url: str):
         ],
         [
             InlineKeyboardButton(
-                text="💬 Support",
+                text="💬 sυᴘᴘσʀᴛ",
                 url=support_chat_url
             ),
             InlineKeyboardButton(
-                text="📢 Updates",
+                text="📢 υᴘᴅᴧᴛᴇs",
                 url=support_channel_url
             ),
         ],
