@@ -102,15 +102,15 @@ _Thank you for choosing me!_
 
     try:
         # Send video instead of photo
-        await message.reply_video(
-            video="https://envs.sh/4l0.mp4",  # Example welcome video URL
+        await message.reply_photo(
+            photo="https://envs.sh/4l0.mp4",  # Example welcome image URL
             caption=start_text,
             reply_markup=InlineKeyboardMarkup(
                 private_panel(OWNER_ID, SUPPORT_CHAT)
             )
         )
     except Exception as e:
-        print(f"Error sending video: {e}")
+        print(f"Error sending photo: {e}")
 
 # /start command handler (group)
 @app.on_message(filters.command("start") & filters.group)
