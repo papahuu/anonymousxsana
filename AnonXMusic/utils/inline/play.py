@@ -1,14 +1,15 @@
 import math
 from pyrogram.types import InlineKeyboardButton
 from AnonXMusic.utils.formatters import time_to_seconds
-from pyrogram import filters
-from pyrogram.types import CallbackQuery
-from AnonXMusic import app  # Apne project ke app ko import karo
 
 # --- BUTTONS ---
 
 def track_markup(_, videoid, user_id, channel, fplay):
     buttons = [
+        [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
         [
             InlineKeyboardButton(
                 text=_["P_B_1"],
@@ -23,11 +24,7 @@ def track_markup(_, videoid, user_id, channel, fplay):
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data=f"forceclose {videoid}|{user_id}",
-            )
-        ],
-        [
-            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+            ),
         ],
     ]
     return buttons
@@ -61,6 +58,10 @@ def stream_markup_timer(_, chat_id, played, dur):
 
     buttons = [
         [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
+        [
             InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
             InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
             InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
@@ -71,20 +72,23 @@ def stream_markup_timer(_, chat_id, played, dur):
             InlineKeyboardButton(
                 text=f"{played} {bar} {dur}",
                 callback_data="GetTimer",
-            )
+            ),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-        ],
-        [
-            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+            InlineKeyboardButton(
+                text=_["CLOSE_BUTTON"],
+                callback_data="close",
+            ),
         ],
     ]
     return buttons
 
 def stream_markup(_, chat_id):
     buttons = [
+        [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
         [
             InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
             InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
@@ -93,17 +97,20 @@ def stream_markup(_, chat_id):
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
         [
-            InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
-        ],
-        [
-            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+            InlineKeyboardButton(
+                text=_["CLOSE_BUTTON"],
+                callback_data="close",
+            ),
         ],
     ]
     return buttons
 
 def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
     buttons = [
+        [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
         [
             InlineKeyboardButton(
                 text=_["P_B_1"],
@@ -120,15 +127,15 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
                 callback_data=f"forceclose {videoid}|{user_id}",
             ),
         ],
-        [
-            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
-        ],
     ]
     return buttons
 
 def livestream_markup(_, videoid, user_id, mode, channel, fplay):
     buttons = [
+        [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
         [
             InlineKeyboardButton(
                 text=_["P_B_3"],
@@ -141,16 +148,16 @@ def livestream_markup(_, videoid, user_id, mode, channel, fplay):
                 callback_data=f"forceclose {videoid}|{user_id}",
             ),
         ],
-        [
-            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
-        ],
     ]
     return buttons
 
 def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
     query = f"{query[:20]}"
     buttons = [
+        [
+            InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
+            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        ],
         [
             InlineKeyboardButton(
                 text=_["P_B_1"],
@@ -174,10 +181,6 @@ def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
                 text="▷",
                 callback_data=f"slider F|{query_type}|{query}|{user_id}|{channel}|{fplay}",
             ),
-        ],
-        [
-            InlineKeyboardButton(text="˹sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-            InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
         ],
     ]
     return buttons
