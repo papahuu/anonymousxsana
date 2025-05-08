@@ -53,8 +53,8 @@ async def shell_cmd(cmd):
 
 
 async def get_stream_url(query, video=False):
-    api_url = "http://188.213.173.141:1470/youtube"
-    api_key = "SANATANIxTECH"
+    api_url = "https://yt.sanatanixtech.site"
+    api_key = "radhexop"
     
     async with httpx.AsyncClient(timeout=60) as client:
         params = {"query": query, "video": video, "api_key": api_key}
