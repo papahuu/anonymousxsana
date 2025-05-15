@@ -1,6 +1,5 @@
 import os
 import re
-
 import aiofiles
 import aiohttp
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
@@ -11,111 +10,87 @@ from AnonXMusic import app
 from config import YOUTUBE_IMG_URL
 
 
-def changeImageSize(maxWidth, maxHeight, image):
-    widthRatio = maxWidth / image.size[0]
-    heightRatio = maxHeight / image.size[1]
-    newWidth = int(widthRatio * image.size[0])
-    newHeight = int(heightRatio * image.size[1])
-    newImage = image.resize((newWidth, newHeight))
-    return newImage
-
-
 def clear(text):
-    list = text.split(" ")
     title = ""
-    for i in list:
-        if len(title) + len(i) < 60:
-            title += " " + i
+    for word in text.split():
+        if len(title) + len(word) < 55:
+            title += " " + word
     return title.strip()
 
 
 async def get_thumb(videoid):
-    if os.path.isfile(f"cache/{videoid}.png"):
-        return f"cache/{videoid}.png"
+    path = f"cache/{videoid}.png"
+    if os.path.isfile(path):
+        return path
 
-    url = f"https://www.youtube.com/watch?v={videoid}"
     try:
-        results = VideosSearch(url, limit=1)
-        for result in (await results.next())["result"]:
-            try:
-                title = result["title"]
-                title = re.sub("\W+", " ", title)
-                title = title.title()
-            except:
-                title = "Unsupported Title"
-            try:
-                duration = result["duration"]
-            except:
-                duration = "Unknown Mins"
-            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-            try:
-                views = result["viewCount"]["short"]
-            except:
-                views = "Unknown Views"
-            try:
-                channel = result["channel"]["name"]
-            except:
-                channel = "Unknown Channel"
+        results = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
+        result = (await results.next())["result"][0]
+        title = clear(re.sub(r"\W+", " ", result.get("title", "Unknown Title").title()))
+        duration = result.get("duration", "Unknown")
+        thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+        views = result.get("viewCount", {}).get("short", "Unknown Views")
+        channel = result.get("channel", {}).get("name", "Unknown Channel")
+    except Exception as e:
+        print(f"Search failed: {e}")
+        return YOUTUBE_IMG_URL
 
+    try:
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
-                    f = await aiofiles.open(f"cache/thumb{videoid}.png", mode="wb")
-                    await f.write(await resp.read())
-                    await f.close()
+                    async with aiofiles.open(f"cache/temp_{videoid}.png", "wb") as f:
+                        await f.write(await resp.read())
 
-        youtube = Image.open(f"cache/thumb{videoid}.png")
-        image1 = changeImageSize(1280, 720, youtube)
-        image2 = image1.convert("RGBA")
-        background = image2.filter(filter=ImageFilter.BoxBlur(10))
-        enhancer = ImageEnhance.Brightness(background)
-        background = enhancer.enhance(0.5)
-        draw = ImageDraw.Draw(background)
-        arial = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 30)
-        font = ImageFont.truetype("AnonXMusic/assets/font.ttf", 30)
-        draw.text((1110, 8), unidecode(app.name), fill="white", font=arial)
-        draw.text(
-            (55, 560),
-            f"{channel} | {views[:23]}",
-            (255, 255, 255),
-            font=arial,
-        )
-        draw.text(
-            (57, 600),
-            clear(title),
-            (255, 255, 255),
-            font=font,
-        )
-        draw.line(
-            [(55, 660), (1220, 660)],
-            fill="white",
-            width=5,
-            joint="curve",
-        )
-        draw.ellipse(
-            [(918, 648), (942, 672)],
-            outline="white",
-            fill="white",
-            width=15,
-        )
-        draw.text(
-            (36, 685),
-            "00:00",
-            (255, 255, 255),
-            font=arial,
-        )
-        draw.text(
-            (1185, 685),
-            f"{duration[:23]}",
-            (255, 255, 255),
-            font=arial,
-        )
-        try:
-            os.remove(f"cache/thumb{videoid}.png")
-        except:
-            pass
-        background.save(f"cache/{videoid}.png")
-        return f"cache/{videoid}.png"
+        base = Image.open(f"cache/temp_{videoid}.png").convert("RGBA")
+        base = base.resize((1280, 720))
+
+        # Cinematic background
+        blur_bg = base.filter(ImageFilter.GaussianBlur(radius=12))
+        overlay = Image.new("RGBA", (1280, 720), (30, 20, 50, 180))
+        bg = Image.alpha_composite(blur_bg, overlay)
+
+        draw = ImageDraw.Draw(bg)
+        font_title = ImageFont.truetype("AnonXMusic/assets/font.ttf", 52)
+        font_small = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 30)
+        font_glow = ImageFont.truetype("AnonXMusic/assets/font.ttf", 54)
+
+        # Vertical light beam (cinematic feel)
+        light_beam = Image.new("RGBA", (1280, 720))
+        beam_draw = ImageDraw.Draw(light_beam)
+        beam_draw.rectangle([(580, 0), (700, 720)], fill=(255, 255, 255, 30))
+        bg = Image.alpha_composite(bg, light_beam)
+
+        # Central title glow
+        glow = Image.new("RGBA", (1280, 720))
+        glow_draw = ImageDraw.Draw(glow)
+        glow_draw.text((60, 510), title, font=font_glow, fill=(255, 255, 255, 100))
+        bg = Image.alpha_composite(bg, glow)
+
+        # Main Title
+        draw.text((60, 510), title, font=font_title, fill="white")
+
+        # Glass Info Panel
+        panel = Image.new("RGBA", (1160, 140), (255, 255, 255, 30))
+        panel = panel.filter(ImageFilter.GaussianBlur(2))
+        bg.paste(panel, (60, 600), panel)
+
+        # Metadata Text
+        draw.text((90, 615), f"Channel: {channel}", fill="white", font=font_small)
+        draw.text((90, 655), f"Views: {views}    Duration: {duration}", fill="white", font=font_small)
+
+        # Progress bar
+        draw.rectangle([(60, 685), (1220, 700)], fill="#FFFFFF40")
+        draw.rectangle([(60, 685), (520, 700)], fill="#1DB954")  # Spotify green style
+
+        # Watermark
+        draw.text((1050, 675), f"Powered by {app.name}", fill="#DDDDDD", font=font_small)
+
+        # Clean and Save
+        os.remove(f"cache/temp_{videoid}.png")
+        bg.save(path)
+        return path
+
     except Exception as e:
-        print(e)
+        print(f"Thumbnail generation error: {e}")
         return YOUTUBE_IMG_URL
