@@ -6,8 +6,8 @@ from AnonXMusic.utils.formatters import time_to_seconds
 
 def support_buttons():
     return [
-        InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/BOT_SUPPORT_GROUP7"),
-        InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/ll_BOTCHAMBER_ll"),
+        InlineKeyboardButton(text="˹ sυᴘᴘσʀᴛ ˼", url="https://t.me/+4RzJkmG039w1OTE9"),
+        InlineKeyboardButton(text="˹ υᴘᴅᴧᴛᴇ ˼", url="https://t.me/Stylish_girls_boys_Dps"),
     ]
 
 # --- MARKUPS ---
@@ -52,12 +52,12 @@ def stream_markup_timer(_, chat_id, played, dur):
             InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
             InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
         ],
-        support_buttons(),
         [
             InlineKeyboardButton(
                 text=f"{played} {bar} {dur}", callback_data="GetTimer"
             ),
         ],
+        support_buttons(),
         [
             InlineKeyboardButton(text=_["CLOSE_BUTTON"], callback_data="close"),
         ],
