@@ -2,7 +2,7 @@ import os
 import re
 import aiofiles
 import aiohttp
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from youtubesearchpython.__future__ import VideosSearch
 
 from AnonXMusic import app
@@ -35,83 +35,38 @@ async def get_thumb(videoid):
         return YOUTUBE_IMG_URL
 
     try:
-        # Download thumbnail image
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
                     async with aiofiles.open(f"cache/temp_{videoid}.png", "wb") as f:
                         await f.write(await resp.read())
 
-        base = Image.open(f"cache/temp_{videoid}.png").convert("RGBA")
+        base = Image.open(f"cache/temp_{videoid}.png").convert("RGB")
         base = base.resize((1280, 720))
+        blur = base.filter(ImageFilter.GaussianBlur(10))
 
-        # Cinematic blurred background + color overlay (purple-pink tint)
-        blur_bg = base.filter(ImageFilter.GaussianBlur(radius=15))
-        overlay = Image.new("RGBA", (1280, 720), (70, 20, 60, 180))
-        bg = Image.alpha_composite(blur_bg, overlay)
+        draw = ImageDraw.Draw(blur)
+        font_title = ImageFont.truetype("AnonXMusic/assets/font.ttf", 55)
+        font_small = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 28)
+        font_channel = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 30)
 
-        draw = ImageDraw.Draw(bg)
-        font_title = ImageFont.truetype("AnonXMusic/assets/font.ttf", 70)
-        font_small = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 30)
+        # Overlay shadow box
+        panel = Image.new("RGBA", (1200, 180), (0, 0, 0, 180))
+        panel = panel.filter(ImageFilter.GaussianBlur(2))
+        blur.paste(panel, (40, 500), panel)
 
-        # Vertical light beam with gradient alpha (stronger at center)
-        light_beam = Image.new("RGBA", (1280, 720))
-        beam_draw = ImageDraw.Draw(light_beam)
-        for x in range(580, 700):
-            alpha = int(30 * (1 - abs((x - 640) / 60)))  # tapering effect
-            beam_draw.line([(x, 0), (x, 720)], fill=(255, 255, 255, alpha))
-        bg = Image.alpha_composite(bg, light_beam)
+        # Draw texts
+        draw = ImageDraw.Draw(blur)
+        draw.text((70, 520), title, font=font_title, fill=(255, 255, 255))
+        draw.text((70, 590), f"Channel: {channel}", font=font_channel, fill=(200, 200, 200))
+        draw.text((70, 630), f"Duration: {duration}     Views: {views}", font=font_small, fill=(180, 180, 180))
 
-        # Glow effect on title: draw multiple offset blurred shadows
-        glow = Image.new("RGBA", (1280, 720))
-        glow_draw = ImageDraw.Draw(glow)
-        glow_text_pos = (60, 520)
+        # Branding
+        draw.text((970, 650), "t.me/BOTMINE_TECH", font=font_small, fill=(255, 255, 255, 180))
 
-        # Draw glow layers behind text (offsets for glow)
-        for offset in range(1, 6):
-            glow_draw.text((glow_text_pos[0] - offset, glow_text_pos[1] - offset), title, font=font_title, fill=(255, 255, 255, 50))
-            glow_draw.text((glow_text_pos[0] + offset, glow_text_pos[1] - offset), title, font=font_title, fill=(255, 255, 255, 50))
-            glow_draw.text((glow_text_pos[0] - offset, glow_text_pos[1] + offset), title, font=font_title, fill=(255, 255, 255, 50))
-            glow_draw.text((glow_text_pos[0] + offset, glow_text_pos[1] + offset), title, font=font_title, fill=(255, 255, 255, 50))
-        glow_draw.text(glow_text_pos, title, font=font_title, fill=(255, 255, 255, 200))
-        bg = Image.alpha_composite(bg, glow)
-
-        # Main title (sharp white text)
-        draw.text(glow_text_pos, title, font=font_title, fill="white")
-
-        # Glass Info Panel with Gaussian blur background
-        panel = Image.new("RGBA", (1160, 140), (255, 255, 255, 40))
-        panel = panel.filter(ImageFilter.GaussianBlur(4))
-        bg.paste(panel, (60, 580), panel)
-
-        # Metadata text
-        draw.text((90, 600), f"Channel: {channel}", fill="white", font=font_small)
-        draw.text((90, 640), f"Views: {views}    Duration: {duration}", fill="white", font=font_small)
-
-        # Rounded progress bar background
-        bar_x1, bar_y1 = 60, 685
-        bar_x2, bar_y2 = 1220, 700
-        radius = 10
-
-        def rounded_rect(draw_obj, box, radius, fill):
-            x1, y1, x2, y2 = box
-            draw_obj.rounded_rectangle(box, radius=radius, fill=fill)
-
-        rounded_rect(draw, (bar_x1, bar_y1, bar_x2, bar_y2), radius, fill="#FFFFFF40")
-
-        # Progress portion - let's say 40% filled for demo
-        progress_end = bar_x1 + int((bar_x2 - bar_x1) * 0.4)
-        rounded_rect(draw, (bar_x1, bar_y1, progress_end, bar_y2), radius, fill="#FF00AA")  # Pinkish glow color
-
-        # Watermark bottom right
-        wm_text = f"Powered by {app.name}"
-        w, h = draw.textsize(wm_text, font=font_small)
-        draw.text((1280 - w - 50, 670), wm_text, fill="#DDDDDD", font=font_small)
-
-        # Clean temp file & save final image
+        # Save final image
         os.remove(f"cache/temp_{videoid}.png")
-        bg.save(path)
-
+        blur.save(path)
         return path
 
     except Exception as e:
