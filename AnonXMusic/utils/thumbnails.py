@@ -2,13 +2,12 @@ import os
 import re
 import aiofiles
 import aiohttp
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 from youtubesearchpython.__future__ import VideosSearch
 
-from AnonXMusic import app  # Assuming your bot structure
-from config import YOUTUBE_IMG_URL  # Fallback thumbnail
+from AnonXMusic import app
+from config import YOUTUBE_IMG_URL
 
-# Helper to trim long titles
 def clear(text):
     title = ""
     for word in text.split():
@@ -16,14 +15,12 @@ def clear(text):
             title += " " + word
     return title.strip()
 
-# Main thumbnail generator
 async def get_thumb(videoid):
     path = f"cache/{videoid}.png"
     if os.path.isfile(path):
         return path
 
     try:
-        # YouTube search
         results = VideosSearch(f"https://www.youtube.com/watch?v={videoid}", limit=1)
         result = (await results.next())["result"][0]
         title = clear(re.sub(r"\W+", " ", result.get("title", "Unknown Title").title()))
@@ -36,20 +33,31 @@ async def get_thumb(videoid):
         return YOUTUBE_IMG_URL
 
     try:
-        # Download thumbnail
         async with aiohttp.ClientSession() as session:
             async with session.get(thumbnail) as resp:
                 if resp.status == 200:
                     async with aiofiles.open(f"cache/temp_{videoid}.png", "wb") as f:
                         await f.write(await resp.read())
 
-        # Load and resize image
         base = Image.open(f"cache/temp_{videoid}.png").convert("RGB")
         base = base.resize((1280, 720))
 
-        # Overlay: semi-transparent black panel with blur for text readability
-        panel = Image.new("RGBA", (1200, 180), (0, 0, 0, 180))
-        panel = panel.filter(ImageFilter.GaussianBlur(4))
+        # Small preview thumbnail
+        preview = base.copy().resize((400, 225))
+        preview = ImageOps.expand(preview, border=5, fill='white')  # white border
+        shadow = Image.new('RGBA', (410, 235), (0, 0, 0, 100))
+        base.paste(shadow, (435, 135), shadow)
+        base.paste(preview, (440, 140))
+
+        # Optional: Play button overlay
+        try:
+            play_icon = Image.open("AnonXMusic/assets/play.png").convert("RGBA").resize((60, 60))
+            base.paste(play_icon, (590, 230), play_icon)
+        except Exception as e:
+            print(f"[Thumbnail] Play button not found: {e}")
+
+        # Info panel
+        panel = Image.new("RGBA", (1200, 180), (0, 0, 0, 180)).filter(ImageFilter.GaussianBlur(4))
         base.paste(panel, (40, 500), panel)
 
         # Fonts
@@ -57,16 +65,12 @@ async def get_thumb(videoid):
         font_small = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 28)
         font_channel = ImageFont.truetype("AnonXMusic/assets/font2.ttf", 30)
 
-        # Drawing text
         draw = ImageDraw.Draw(base)
         draw.text((70, 520), title, font=font_title, fill=(255, 255, 255))
         draw.text((70, 590), f"Channel: {channel}", font=font_channel, fill=(200, 200, 200))
         draw.text((70, 630), f"Duration: {duration}     Views: {views}", font=font_small, fill=(180, 180, 180))
-
-        # Branding text
         draw.text((970, 650), "t.me/BOTMINE_TECH", font=font_small, fill=(255, 255, 255))
 
-        # Cleanup temp and save final
         os.remove(f"cache/temp_{videoid}.png")
         base.save(path)
         return path
