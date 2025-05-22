@@ -18,6 +18,11 @@ import aiohttp
 import config
 from config import API_URL, API_KEY
 
+#api-integration
+ 
+API_URL = getenv("API_URL", "https://api.thequickearn.xyz") #youtube song url
+API_KEY = getenv("API_KEY", None) # youtube song api key, get it from https://t.me/rishu1286
+
 
 def cookie_txt_file():
     cookie_dir = f"{os.getcwd()}/cookies"
