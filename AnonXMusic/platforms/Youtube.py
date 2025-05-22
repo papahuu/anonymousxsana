@@ -37,14 +37,23 @@ async def download_song(link: str):
             #print(f"File already exists: {file_path}")
             return file_path
 
+    API_URL = "https://example.com/api"  # Replace with actual URL
+API_KEY = "your_api_key"  # Replace with your actual key
+
+async def fetch_song_data(video_id: str):
     song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
     async with aiohttp.ClientSession() as session:
-    for attempt in range(10):
-        try:
-            async with session.get(song_url) as response:
-                if response.status != 200:
-                    raise Exception(f"API request failed with status code {response.status}")
-
+        for attempt in range(10):
+            try:
+                async with session.get(song_url) as response:
+                    if response.status != 200:
+                        raise Exception(f"API request failed with status code {response.status}")
+                    data = await response.json()
+                    return data
+            except Exception as e:
+                if attempt == 9:
+                    raise e  # Give up after final attempt
+                await asyncio.sleep(1)  # Wait before retrying
                 data = await response.json()
                 status = data.get("status", "").lower()
 
