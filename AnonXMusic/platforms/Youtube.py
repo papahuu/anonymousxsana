@@ -38,7 +38,7 @@ async def download_song(link: str):
             return file_path
 
     API_URL = "https://api.thequickearn.xyz"  # Replace with actual URL
-    API_KEY = "None"  # Replace with your actual key
+    API_KEY = "NxGBNexGenBotsead0f5"  # Replace with your actual key
 
 async def fetch_song_data(video_id: str):
     song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
