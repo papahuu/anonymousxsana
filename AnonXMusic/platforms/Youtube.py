@@ -16,13 +16,7 @@ import random
 import logging
 import aiohttp
 import config
-from os import getenv
-from dotenv import load_dotenv
-
-#api-integration
- 
-API_URL = getenv("API_URL", "https://api.thequickearn.xyz") #youtube song url
-API_KEY = getenv("API_KEY", None) # youtube song api key, get it from https://t.me/rishu1286
+from config import API_URL, API_KEY
 
 
 def cookie_txt_file():
@@ -45,29 +39,31 @@ async def download_song(link: str):
 
     song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
     async with aiohttp.ClientSession() as session:
-        while True:
-            try:
-                async with session.get(song_url) as response:
-                    if response.status != 200:
-                        raise Exception(f"API request failed with status code {response.status}")
-                    data = await response.json()
-                    status = data.get("status", "").lower()
-                    if status == "downloading":
-                        await asyncio.sleep(2)
-                        continue
-                    elif status == "error":
-                        error_msg = data.get("error") or data.get("message") or "Unknown error"
-                        raise Exception(f"API error: {error_msg}")
-                    elif status == "done":
-                        download_url = data.get("link")
-                        if not download_url:
-                            raise Exception("API response did not provide a download URL.")
-                        break
-                    else:
-                        raise Exception(f"Unexpected status '{status}' from API.")
-            except Exception as e:
-                print(f"Error while checking API status: {e}")
-                return None
+    for attempt in range(10):
+        try:
+            async with session.get(song_url) as response:
+                if response.status != 200:
+                    raise Exception(f"API request failed with status code {response.status}")
+
+                data = await response.json()
+                status = data.get("status", "").lower()
+
+                if status == "done":
+                    download_url = data.get("link")
+                    if not download_url:
+                        raise Exception("API response did not provide a download URL.")
+                    break
+                elif status == "downloading":
+                    await asyncio.sleep(4)
+                else:
+                    error_msg = data.get("error") or data.get("message") or f"Unexpected status '{status}'"
+                    raise Exception(f"API error: {error_msg}")
+        except Exception as e:
+            print(f"[FAIL] {e}")
+            return None
+    else:
+        print("⏱️ Max retries reached. Still downloading...")
+        return None
 
         try:
             file_format = data.get("format", "mp3")
