@@ -16,7 +16,8 @@ import random
 import logging
 import aiohttp
 import config
-from config import API_URL, API_KEY
+from os import getenv
+from dotenv import load_dotenv
 
 #api-integration
  
