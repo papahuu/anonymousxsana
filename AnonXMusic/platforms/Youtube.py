@@ -37,8 +37,8 @@ async def download_song(link: str):
             #print(f"File already exists: {file_path}")
             return file_path
 
-    API_URL = "https://example.com/api"  # Replace with actual URL
-API_KEY = "your_api_key"  # Replace with your actual key
+    API_URL = "https://api.thequickearn.xyz"  # Replace with actual URL
+API_KEY = "none"  # Replace with your actual key
 
 async def fetch_song_data(video_id: str):
     song_url = f"{API_URL}/song/{video_id}?api={API_KEY}"
