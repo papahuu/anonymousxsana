@@ -9,27 +9,9 @@ from pyrogram.enums import MessageEntityType
 from concurrent.futures import ThreadPoolExecutor
 from youtubesearchpython.__future__ import VideosSearch, CustomSearch
 
-from AnonXMusic import LOGGER
-from AnonXMusic.utils.database import is_on_off
-from AnonXMusic.utils.formatters import time_to_seconds
-
-#=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×[ NO NEED COOKIES ]=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×
-
-def cookie_txt_file():
-    try:
-        folder_path = f"{os.getcwd()}/cookies"
-        filename = f"{os.getcwd()}/cookies/logs.csv"
-        txt_files = glob.glob(os.path.join(folder_path, '*.txt'))
-        if not txt_files:
-            raise FileNotFoundError("No .txt files found in the specified folder.")
-        cookie_txt_file = random.choice(txt_files)
-        with open(filename, 'a') as file:
-            file.write(f'Choosen File : {cookie_txt_file}\n')
-        return f"""cookies/{str(cookie_txt_file).split("/")[-1]}"""
-    except:
-        pass
-        
-#=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×=×
+from AnonMusic import LOGGER
+from AnonMusic.utils.database import is_on_off
+from AnonMusic.utils.formatters import time_to_seconds
 
 def time_to_seconds(time):
     stringt = str(time)
@@ -54,9 +36,9 @@ async def shell_cmd(cmd):
 async def get_stream_url(query, video=False):
     apis = [
         {
-            "url": "http://5.249.150.55:1470/youtube",
-            "key": "ca0adbc6c6da592829cf643dcd19bc5b"
-        },
+            "url": "http://5.249.150.146:1470/youtube",
+            "key": "c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3"
+        }
         
     ]
 
@@ -72,10 +54,9 @@ async def get_stream_url(query, video=False):
                     if stream_url:
                         return stream_url
             except Exception:
-                continue  # अगली API पर ट्राय करो
+                continue
 
-    return ""  # अगर कोई भी API काम ना करे
-
+    return ""
 
 
 class YouTubeAPI:
